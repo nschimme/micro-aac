@@ -25,7 +25,7 @@ jobs:
           cd build
           ctest --output-on-failure
 
-  esp32-qemu-build:
+  esp32-qemu-build-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -46,3 +46,7 @@ jobs:
         run: |
           cd examples/encode_benchmark
           pio run -e esp32s3
+
+      - name: Run QEMU Test Runner
+        run: |
+          ./tests/qemu/run_qemu_test.sh

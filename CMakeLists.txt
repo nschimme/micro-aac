@@ -60,7 +60,11 @@ if(ESP_IDF_BUILD)
     )
 
     target_compile_definitions(${COMPONENT_LIB} PRIVATE HAVE_CONFIG_H)
-    target_compile_options(${COMPONENT_LIB} PRIVATE -include "${CONFIG_H_DIR}/config.h" -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_psram_malloc.h")
+    target_compile_options(${COMPONENT_LIB} PRIVATE
+        -include "${CONFIG_H_DIR}/config.h"
+        -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_psram_malloc.h"
+        -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_fastmath.h"
+    )
 
 else()
     project(micro_aac VERSION 0.1.0 LANGUAGES C CXX)
