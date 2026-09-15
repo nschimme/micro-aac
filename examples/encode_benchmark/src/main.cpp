@@ -1,5 +1,6 @@
 #include "micro_aac/aac_encoder.h"
 #include <stdio.h>
+#include <inttypes.h>
 #include <math.h>
 
 #if defined(ESP_PLATFORM)
@@ -28,7 +29,7 @@ extern "C" void app_main(void) {
 
     uint32_t frame_samples = encoder.get_frame_samples();
     uint32_t max_out = encoder.get_max_output_bytes();
-    printf("Encoder ready. Frame samples: %u, Max output bytes: %u\n", frame_samples, max_out);
+    printf("Encoder ready. Frame samples: %" PRIu32 ", Max output bytes: %" PRIu32 "\n", frame_samples, max_out);
 
     int16_t *pcm_buf = (int16_t *)malloc(frame_samples * sizeof(int16_t));
     uint8_t *out_buf = (uint8_t *)malloc(max_out);
@@ -45,7 +46,7 @@ extern "C" void app_main(void) {
     uint32_t bytes_written = 0;
     status = encoder.encode(pcm_buf, frame_samples, out_buf, max_out, &bytes_written);
     if (status == MICRO_AAC_OK) {
-        printf("Encoded 1 frame successfully: %u bytes written\n", bytes_written);
+        printf("Encoded 1 frame successfully: %" PRIu32 " bytes written\n", bytes_written);
     } else {
         printf("Encoding failed: %d\n", status);
     }
