@@ -1,8 +1,8 @@
 {
   "name": "micro-aac",
   "version": "0.1.0",
-  "description": "AAC encoder wrapper library for ESP32 and ESP-IDF based on FAAC",
-  "keywords": ["aac", "audio", "encoder", "esp32", "esphome"],
+  "description": "AAC encoder library for ESP32 and ESP-IDF based on FAAC and Helix AAC decoder",
+  "keywords": ["aac", "audio", "encoder", "decoder", "esp32", "esphome"],
   "license": "LGPL-2.1-or-later",
   "repository": {
     "type": "git",
@@ -14,8 +14,32 @@
       "maintainer": true
     }
   ],
-  "frameworks": ["espidf"],
-  "platforms": ["espressif32"],
+  "frameworks": "*",
+  "platforms": "*",
+  "build": {
+    "flags": [
+      "-DHAVE_CONFIG_H",
+      "-DHELIX_CONFIG_H",
+      "-DUSE_DEFAULT_STDLIB",
+      "-Iinclude",
+      "-Ilib/faac/include",
+      "-Ilib/faac/libfaac",
+      "-Ilib/helix-aac/src",
+      "-Ilib/helix-aac/src/libhelix-aac",
+      "-Ilib/helix-aac/src/utils"
+    ],
+    "srcFilter": [
+      "+<src/>",
+      "+<lib/faac/libfaac/*.c>",
+      "-<lib/faac/libfaac/quantize_sse.c>",
+      "+<lib/helix-aac/src/libhelix-aac/*.c>",
+      "-<lib/helix-aac/src/libhelix-aac/bitstream.c>",
+      "-<lib/helix-aac/src/libhelix-aac/fft.c>",
+      "-<lib/helix-aac/src/libhelix-aac/sbr.c>",
+      "-<lib/helix-aac/src/libhelix-aac/tns.c>",
+      "+<lib/helix-aac/src/utils/*.cpp>"
+    ]
+  },
   "export": {
     "include": [
       "src/*",
@@ -28,6 +52,12 @@
       "README.md",
       "library.json",
       "idf_component.yml"
+    ],
+    "exclude": [
+      "build",
+      ".git",
+      ".github",
+      "tests"
     ]
   }
 }
