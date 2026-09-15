@@ -1,0 +1,33 @@
+{
+  "name": "micro-aac",
+  "version": "0.1.0",
+  "description": "AAC encoder wrapper library for ESP32 and ESP-IDF based on FAAC",
+  "keywords": ["aac", "audio", "encoder", "esp32", "esphome"],
+  "license": "LGPL-2.1-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/esphome-libs/micro-aac"
+  },
+  "authors": [
+    {
+      "name": "ESPHome",
+      "maintainer": true
+    }
+  ],
+  "frameworks": ["espidf"],
+  "platforms": ["espressif32"],
+  "export": {
+    "include": [
+      "src/*",
+      "include/*",
+      "lib/*",
+      "cmake/*",
+      "CMakeLists.txt",
+      "Kconfig",
+      "LICENSE",
+      "README.md",
+      "library.json",
+      "idf_component.yml"
+    ]
+  }
+}

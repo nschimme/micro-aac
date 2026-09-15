@@ -1,0 +1,29 @@
+# Kconfig for micro-aac component in ESP-IDF
+
+menu "micro-aac Configuration"
+
+    config MICRO_AAC_MAX_CHANNELS
+        int "Maximum Audio Channels"
+        default 2
+        range 1 8
+        help
+            Maximum number of channels supported by FAAC encoder (1 = mono, 2 = stereo).
+            Lower numbers reduce static array and memory overhead.
+
+    config MICRO_AAC_SBR_DECIMATION
+        int "SBR Analysis Decimation Density"
+        default 1
+        range 1 8
+        help
+            SBR spectral analysis density (1 = full quality, 2 = 2nd slot, 4 = 4th slot, 8 = 8th slot).
+            Higher values reduce CPU usage for HE-AAC.
+
+    config MICRO_AAC_USE_SPIRAM
+        bool "Prefer SPIRAM (PSRAM) for Memory Allocations"
+        default y
+        depends on SPIRAM
+        help
+            When enabled, memory allocations for the AAC encoder will prefer SPIRAM/PSRAM
+            to save internal RAM.
+
+endmenu

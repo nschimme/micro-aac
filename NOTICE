@@ -1,0 +1,5 @@
+micro-aac
+Copyright 2024 ESPHome
+
+This product includes software developed by ESPHome and contributors.
+This product includes the FAAC AAC audio encoder library (libfaac), licensed under GNU LGPL 2.1 or later.

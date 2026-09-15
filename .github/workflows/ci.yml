@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  host-build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Configure and build host tests
+        run: |
+          mkdir build && cd build
+          cmake ..
+          make
+
+      - name: Run CTest
+        run: |
+          cd build
+          ctest --output-on-failure

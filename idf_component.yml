@@ -1,0 +1,11 @@
+version: "0.1.0"
+description: "AAC audio encoder library for ESP32 and ESP-IDF using FAAC"
+url: "https://github.com/esphome-libs/micro-aac"
+targets:
+  - esp32
+  - esp32s2
+  - esp32s3
+  - esp32c3
+  - esp32c6
+  - esp32h2
+  - esp32p4
