@@ -37,6 +37,13 @@ typedef struct {
     bool prefer_psram;           /* If true and on ESP32, attempt PSRAM/SPIRAM allocation */
 } micro_aac_config_t;
 
+typedef struct {
+    uint32_t sample_rate;
+    uint32_t num_channels;
+    uint32_t frame_length;      /* Total ADTS frame size in bytes including header */
+    uint8_t  profile;           /* AAC Profile / Object type (0=Main, 1=LC, 2=SSR) */
+} micro_aac_adts_header_t;
+
 typedef struct micro_aac_encoder micro_aac_encoder_t;
 
 /**
@@ -60,15 +67,17 @@ uint32_t micro_aac_encoder_get_frame_samples(micro_aac_encoder_t *encoder);
 uint32_t micro_aac_encoder_get_max_output_bytes(micro_aac_encoder_t *encoder);
 
 /**
+ * Get priming delay in samples/channel for gapless playback tagging.
+ */
+uint32_t micro_aac_encoder_get_delay(micro_aac_encoder_t *encoder);
+
+/**
+ * Parse an ADTS header from an encoded frame buffer (at least 7 bytes).
+ */
+micro_aac_status_t micro_aac_adts_parse_header(const uint8_t *adts_buf, uint32_t buf_len, micro_aac_adts_header_t *out_hdr);
+
+/**
  * Encode PCM audio samples (16-bit signed PCM, interleaved if stereo) into AAC frame.
- *
- * @param encoder Pointer to AAC encoder.
- * @param pcm_in Pointer to 16-bit PCM input buffer.
- * @param in_samples Total sample count across all channels (e.g., frame_samples * num_channels).
- *                   Pass in_samples = 0 to flush remaining buffered frames.
- * @param out_buf Output buffer for encoded AAC data.
- * @param out_capacity Size of output buffer.
- * @param bytes_written Written size of AAC data.
  */
 micro_aac_status_t micro_aac_encoder_encode(
     micro_aac_encoder_t *encoder,
@@ -121,6 +130,10 @@ public:
 
     uint32_t get_max_output_bytes() const {
         return encoder_ ? micro_aac_encoder_get_max_output_bytes(encoder_) : 0;
+    }
+
+    uint32_t get_delay() const {
+        return encoder_ ? micro_aac_encoder_get_delay(encoder_) : 0;
     }
 
     micro_aac_status_t encode(const int16_t *pcm_in, uint32_t in_samples, uint8_t *out_buf, uint32_t out_capacity, uint32_t *bytes_written) {

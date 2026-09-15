@@ -16,6 +16,12 @@ struct micro_aac_encoder {
     uint32_t asc_len;
 };
 
+static const uint32_t aac_sample_rates[16] = {
+    96000, 88200, 64000, 48000, 44100, 32000,
+    24000, 22050, 16000, 12000, 11025, 8000,
+    7350,  0,     0,     0
+};
+
 void micro_aac_config_init(micro_aac_config_t *config) {
     if (!config) return;
     memset(config, 0, sizeof(*config));
@@ -100,6 +106,31 @@ uint32_t micro_aac_encoder_get_frame_samples(micro_aac_encoder_t *encoder) {
 uint32_t micro_aac_encoder_get_max_output_bytes(micro_aac_encoder_t *encoder) {
     if (!encoder) return 0;
     return encoder->info.max_output_bytes;
+}
+
+uint32_t micro_aac_encoder_get_delay(micro_aac_encoder_t *encoder) {
+    if (!encoder) return 0;
+    return encoder->info.encoder_delay;
+}
+
+micro_aac_status_t micro_aac_adts_parse_header(const uint8_t *adts_buf, uint32_t buf_len, micro_aac_adts_header_t *out_hdr) {
+    if (!adts_buf || !out_hdr || buf_len < 7) {
+        return MICRO_AAC_ERR_INVALID_ARG;
+    }
+
+    if (adts_buf[0] != 0xFF || (adts_buf[1] & 0xF0) != 0xF0) {
+        return MICRO_AAC_ERR_INVALID_ARG;
+    }
+
+    out_hdr->profile = (adts_buf[2] >> 6) & 0x03;
+    uint8_t sr_idx = (adts_buf[2] >> 2) & 0x0F;
+    out_hdr->sample_rate = aac_sample_rates[sr_idx];
+    out_hdr->num_channels = ((adts_buf[2] & 0x01) << 2) | ((adts_buf[3] >> 6) & 0x03);
+    out_hdr->frame_length = ((uint32_t)(adts_buf[3] & 0x03) << 11) |
+                            ((uint32_t)adts_buf[4] << 3) |
+                            ((uint32_t)(adts_buf[5] >> 5) & 0x07);
+
+    return MICRO_AAC_OK;
 }
 
 micro_aac_status_t micro_aac_encoder_encode(

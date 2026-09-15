@@ -22,8 +22,9 @@ int main(void) {
 
     uint32_t frame_samples = micro_aac_encoder_get_frame_samples(encoder);
     uint32_t max_out = micro_aac_encoder_get_max_output_bytes(encoder);
+    uint32_t delay = micro_aac_encoder_get_delay(encoder);
 
-    printf("Encoder initialized: frame_samples=%u, max_output_bytes=%u\n", frame_samples, max_out);
+    printf("Encoder initialized: frame_samples=%u, max_output_bytes=%u, delay=%u\n", frame_samples, max_out, delay);
 
     int16_t *pcm_in = (int16_t *)malloc(frame_samples * sizeof(int16_t));
     uint8_t *out_buf = (uint8_t *)malloc(max_out);
@@ -54,11 +55,20 @@ int main(void) {
 
     // Verify ADTS header if ADTS format was selected and bytes written > 0
     if (config.format == MICRO_AAC_FORMAT_ADTS && bytes_written >= 7) {
-        // ADTS syncword is 0xFFF
-        if (out_buf[0] == 0xFF && (out_buf[1] & 0xF0) == 0xF0) {
-            printf("ADTS syncword verified: 0x%02X 0x%02X\n", out_buf[0], out_buf[1]);
+        micro_aac_adts_header_t hdr;
+        status = micro_aac_adts_parse_header(out_buf, bytes_written, &hdr);
+        if (status == MICRO_AAC_OK) {
+            printf("ADTS header parsed: sample_rate=%u, channels=%u, frame_len=%u, profile=%u\n",
+                   hdr.sample_rate, hdr.num_channels, hdr.frame_length, hdr.profile);
+            if (hdr.sample_rate != config.sample_rate || hdr.num_channels != config.num_channels) {
+                fprintf(stderr, "Header sample rate or channel mismatch\n");
+                free(pcm_in);
+                free(out_buf);
+                micro_aac_encoder_destroy(encoder);
+                return 1;
+            }
         } else {
-            fprintf(stderr, "Invalid ADTS syncword: 0x%02X 0x%02X\n", out_buf[0], out_buf[1]);
+            fprintf(stderr, "Failed to parse ADTS header: %d\n", status);
             free(pcm_in);
             free(out_buf);
             micro_aac_encoder_destroy(encoder);
