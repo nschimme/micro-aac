@@ -33,6 +33,10 @@
       "+<lib/faac/libfaac/*.c>",
       "-<lib/faac/libfaac/quantize_sse.c>",
       "+<lib/helix-aac/src/libhelix-aac/*.c>",
+      "-<lib/helix-aac/src/libhelix-aac/bitstream.c>",
+      "-<lib/helix-aac/src/libhelix-aac/fft.c>",
+      "-<lib/helix-aac/src/libhelix-aac/sbr.c>",
+      "-<lib/helix-aac/src/libhelix-aac/tns.c>",
       "+<lib/helix-aac/src/utils/*.cpp>"
     ]
   },
