@@ -1,3 +1,6 @@
 [submodule "lib/faac"]
 	path = lib/faac
 	url = https://github.com/knik0/faac.git
+[submodule "lib/helix-aac"]
+	path = lib/helix-aac
+	url = https://github.com/pschatzmann/arduino-libhelix.git

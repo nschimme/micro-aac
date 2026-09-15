@@ -1,14 +1,14 @@
 # micro-aac
 
-Wrapper library for the FAAC AAC audio encoder optimized for ESP32 and ESP-IDF with PSRAM support and configurable settings.
+Wrapper library for FAAC AAC audio encoder and Helix AAC audio decoder optimized for ESP32, ESP-IDF, PlatformIO, and ESPHome.
 
 ## Features
 
-- **FAAC AAC Encoder**: Real-time AAC audio encoding for ESP32 and embedded targets.
+- **AAC Encoder & Decoder**: Complete AAC encoding (FAAC) and fixed-point decoding (Helix AAC).
 - **Dual Support**: Formatted for both ESP-IDF components (`idf_component.yml`) and PlatformIO (`library.json`).
 - **PSRAM Awareness**: Automatic memory placement preferences for ESP32 SPIRAM/PSRAM.
 - **Flexible Stream Output**: Configurable ADTS stream format or raw AAC stream output with AudioSpecificConfig metadata.
-- **C and C++ API**: Clean C function interfaces and modern C++ `micro_aac::AACEncoder` wrapper.
+- **C and C++ API**: Clean C function interfaces and modern C++ `micro_aac::AACEncoder` / `micro_aac::AACDecoder` wrappers.
 
 ## Installation
 
@@ -24,7 +24,7 @@ lib_deps =
     https://github.com/esphome-libs/micro-aac.git
 ```
 
-## Quick Start (C++)
+## Encoder Usage (C++)
 
 ```cpp
 #include "micro_aac/aac_encoder.h"
@@ -47,29 +47,26 @@ if (encoder.init(config) == MICRO_AAC_OK) {
 }
 ```
 
-## Quick Start (C)
+## Decoder Usage (C++)
 
-```c
-#include "micro_aac/aac_encoder.h"
+```cpp
+#include "micro_aac/aac_decoder.h"
 
-micro_aac_config_t config;
-micro_aac_config_init(&config);
-config.sample_rate = 16000;
-config.num_channels = 1;
+micro_aac_dec_config_t dec_config;
+micro_aac_dec_config_init(&dec_config);
 
-micro_aac_encoder_t *encoder = NULL;
-if (micro_aac_encoder_create(&config, &encoder) == MICRO_AAC_OK) {
-    uint32_t frame_samples = micro_aac_encoder_get_frame_samples(encoder);
-    uint32_t max_out = micro_aac_encoder_get_max_output_bytes(encoder);
+micro_aac::AACDecoder decoder;
+if (decoder.init(dec_config) == MICRO_AAC_DEC_OK) {
+    uint8_t *in_ptr = aac_data;
+    int32_t bytes_left = aac_data_len;
+    uint32_t samps_decoded = 0;
 
-    uint32_t bytes_written = 0;
-    micro_aac_encoder_encode(encoder, pcm_data, frame_samples, out_buf, max_out, &bytes_written);
-
-    micro_aac_encoder_destroy(encoder);
+    decoder.decode(&in_ptr, &bytes_left, pcm_out_buffer, &samps_decoded);
 }
 ```
 
 ## License
 
 This project wrapper is licensed under Apache-2.0.
-The underlying FAAC encoder is licensed under LGPL-2.1-or-later.
+The FAAC encoder component is licensed under LGPL-2.1-or-later.
+The Helix AAC decoder component is licensed under RPSL-1.0 / RCSL.

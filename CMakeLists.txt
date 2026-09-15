@@ -46,20 +46,23 @@ configure_file(
     "${CONFIG_H_DIR}/config.h"
 )
 
-micro_aac_get_sources("${MICRO_AAC_COMPONENT_DIR}/lib/faac")
+micro_aac_get_sources("${MICRO_AAC_COMPONENT_DIR}/lib/faac" "${MICRO_AAC_COMPONENT_DIR}/lib/helix-aac")
 
 if(ESP_IDF_BUILD)
     idf_component_register(
-        SRCS ${FAAC_SOURCES} ${WRAPPER_SOURCES}
+        SRCS ${FAAC_SOURCES} ${HELIX_AAC_SOURCES} ${WRAPPER_SOURCES}
         INCLUDE_DIRS
             "include"
         PRIV_INCLUDE_DIRS
             "${CONFIG_H_DIR}"
             "${MICRO_AAC_COMPONENT_DIR}/lib/faac/include"
             "${MICRO_AAC_COMPONENT_DIR}/lib/faac/libfaac"
+            "${MICRO_AAC_COMPONENT_DIR}/lib/helix-aac/src"
+            "${MICRO_AAC_COMPONENT_DIR}/lib/helix-aac/src/libhelix-aac"
+            "${MICRO_AAC_COMPONENT_DIR}/lib/helix-aac/src/utils"
     )
 
-    target_compile_definitions(${COMPONENT_LIB} PRIVATE HAVE_CONFIG_H)
+    target_compile_definitions(${COMPONENT_LIB} PRIVATE HAVE_CONFIG_H HELIX_CONFIG_H USE_DEFAULT_STDLIB)
     target_compile_options(${COMPONENT_LIB} PRIVATE
         -include "${CONFIG_H_DIR}/config.h"
         -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_psram_malloc.h"
@@ -69,7 +72,7 @@ if(ESP_IDF_BUILD)
 else()
     project(micro_aac VERSION 0.1.0 LANGUAGES C CXX)
 
-    add_library(micro_aac ${FAAC_SOURCES} ${WRAPPER_SOURCES})
+    add_library(micro_aac ${FAAC_SOURCES} ${HELIX_AAC_SOURCES} ${WRAPPER_SOURCES})
 
     target_include_directories(micro_aac
         PUBLIC
@@ -79,9 +82,12 @@ else()
             "${CONFIG_H_DIR}"
             "${CMAKE_CURRENT_SOURCE_DIR}/lib/faac/include"
             "${CMAKE_CURRENT_SOURCE_DIR}/lib/faac/libfaac"
+            "${CMAKE_CURRENT_SOURCE_DIR}/lib/helix-aac/src"
+            "${CMAKE_CURRENT_SOURCE_DIR}/lib/helix-aac/src/libhelix-aac"
+            "${CMAKE_CURRENT_SOURCE_DIR}/lib/helix-aac/src/utils"
     )
 
-    target_compile_definitions(micro_aac PRIVATE HAVE_CONFIG_H)
+    target_compile_definitions(micro_aac PRIVATE HAVE_CONFIG_H USE_DEFAULT_STDLIB)
     target_compile_options(micro_aac PRIVATE -include "${CONFIG_H_DIR}/config.h")
 
     find_library(MATH_LIBRARY m)
@@ -99,6 +105,13 @@ else()
             target_link_libraries(test_aac_encoder PRIVATE ${MATH_LIBRARY})
         endif()
         add_test(NAME test_aac_encoder COMMAND test_aac_encoder)
+
+        add_executable(test_aac_decoder tests/test_aac_decoder.c)
+        target_link_libraries(test_aac_decoder PRIVATE micro_aac)
+        if(MATH_LIBRARY)
+            target_link_libraries(test_aac_decoder PRIVATE ${MATH_LIBRARY})
+        endif()
+        add_test(NAME test_aac_decoder COMMAND test_aac_decoder)
 
         add_executable(test_adts_conformance tests/conformance/test_adts_conformance.c)
         target_link_libraries(test_adts_conformance PRIVATE micro_aac)
