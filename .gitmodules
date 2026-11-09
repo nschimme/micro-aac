@@ -1,3 +1,4 @@
 [submodule "lib/faac"]
 	path = lib/faac
 	url = https://github.com/FreewareAdvancedAudio/faac.git
+	branch = master
