@@ -22,6 +22,7 @@ void micro_aac_dec_config_init(micro_aac_dec_config_t *config) {
     config->prefer_psram = true;
     config->asc_buf = NULL;
     config->asc_len = 0;
+    config->downmix = MICRO_AAC_DEC_DOWNMIX_NONE;
 }
 
 micro_aac_dec_status_t micro_aac_decoder_create(const micro_aac_dec_config_t *config, micro_aac_decoder_t **decoder_out) {
@@ -60,7 +61,14 @@ micro_aac_dec_status_t micro_aac_decoder_create(const micro_aac_dec_config_t *co
 
     f_cfg.stream_format = (dec->config.stream_format == MICRO_AAC_DEC_STREAM_RAW) ? FAAD_STREAM_RAW : FAAD_STREAM_ADTS;
     f_cfg.output_format = FAAD_OUTPUT_16BIT;
-    f_cfg.downmix_mode = FAAD_DOWNMIX_NONE;
+    switch (dec->config.downmix) {
+        case MICRO_AAC_DEC_DOWNMIX_MONO:   f_cfg.downmix_mode = FAAD_DOWNMIX_MONO;   break;
+        case MICRO_AAC_DEC_DOWNMIX_STEREO: f_cfg.downmix_mode = FAAD_DOWNMIX_STEREO; break;
+        case MICRO_AAC_DEC_DOWNMIX_NONE:   f_cfg.downmix_mode = FAAD_DOWNMIX_NONE;   break;
+        default:
+            free(dec);
+            return MICRO_AAC_DEC_ERR_INVALID_ARG;
+    }
 
     st = faad_decoder_open(&f_cfg, dec->config.asc_buf, dec->config.asc_len, &dec->faad_handle);
     if (st != FAAD_OK || !dec->faad_handle) {

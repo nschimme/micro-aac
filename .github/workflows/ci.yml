@@ -14,6 +14,11 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Check source list against upstream Meson build
+        run: |
+          sudo apt-get update && sudo apt-get install -y meson ninja-build
+          python3 -I scripts/check_sources.py
+
       - name: Configure and build host tests
         run: |
           mkdir build && cd build
