@@ -122,7 +122,8 @@ Home Assistant's ffmpeg proxy produces ADTS (`ffmpeg -f adts`), which this path 
 ### Encoder
 
 The encoder stays available for future use, such as reducing over-the-air data on the device (compare the Opus encoder in micro-opus).
-It is only built into firmware that calls it.
+It is compiled with the component but the linker drops it from firmware that never references it (a decode-only ESP32-S3 image built with ESP-IDF 5.5.1 contains no encoder symbols).
+That decode-only image is roughly 62 KB of flash code and 15 KB of flash data larger than an empty app.
 
 ## Memory Usage
 

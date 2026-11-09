@@ -66,10 +66,12 @@ if(ESP_IDF_BUILD)
         USE_DEFAULT_STDLIB
         COMMON_PREFIX=faac_
     )
+    # SHELL: keeps each "-include <file>" pair intact. Without it CMake de-duplicates the
+    # repeated -include flags into "-include a b c" and gcc treats b and c as source files.
     target_compile_options(${COMPONENT_LIB} PRIVATE
-        -include "${CONFIG_H_DIR}/config.h"
-        -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_psram_malloc.h"
-        -include "${MICRO_AAC_COMPONENT_DIR}/include/faac_fastmath.h"
+        "SHELL:-include ${CONFIG_H_DIR}/config.h"
+        "SHELL:-include ${MICRO_AAC_COMPONENT_DIR}/include/faac_psram_malloc.h"
+        "SHELL:-include ${MICRO_AAC_COMPONENT_DIR}/include/faac_fastmath.h"
     )
 
 else()
