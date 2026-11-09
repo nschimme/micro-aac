@@ -6,6 +6,10 @@
 #if defined(ESP_PLATFORM)
 #include "esp_heap_caps.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 static inline void *faac_psram_malloc(size_t size) {
 #if defined(CONFIG_MICRO_AAC_USE_SPIRAM)
     void *ptr = heap_caps_malloc(size, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
@@ -25,6 +29,17 @@ static inline void *faac_psram_calloc(size_t n, size_t size) {
 static inline void faac_psram_free(void *ptr) {
     free(ptr);
 }
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifndef AllocMemory
+#define AllocMemory(size) faac_psram_malloc(size)
+#endif
+#ifndef FreeMemory
+#define FreeMemory(block) faac_psram_free(block)
+#endif
 
 #define malloc(s) faac_psram_malloc(s)
 #define calloc(n, s) faac_psram_calloc(n, s)

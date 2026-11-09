@@ -1,14 +1,38 @@
-# micro-aac
+# micro-aac - Embedded AAC Wrapper
 
-Wrapper library for FAAC AAC audio encoder and Helix AAC audio decoder optimized for ESP32, ESP-IDF, PlatformIO, and ESPHome.
+Embedded-focused wrapper for the FAAC AAC audio encoder and FAAD AAC audio decoder. Designed as an ESP-IDF component and PlatformIO library with PSRAM support for ESP32 and ESPHome.
 
 ## Features
 
-- **AAC Encoder & Decoder**: Complete AAC encoding (FAAC) and fixed-point decoding (Helix AAC).
+- **AAC Encoder & Decoder**: Complete AAC encoding (FAAC) and decoding (FAAD3).
 - **Dual Support**: Formatted for both ESP-IDF components (`idf_component.yml`) and PlatformIO (`library.json`).
-- **PSRAM Awareness**: Automatic memory placement preferences for ESP32 SPIRAM/PSRAM.
-- **Flexible Stream Output**: Configurable ADTS stream format or raw AAC stream output with AudioSpecificConfig metadata.
+- **PSRAM Awareness**: Automatic memory placement preferences for ESP32 SPIRAM/PSRAM using custom allocators.
+- **Flexible Stream Format**: Configurable ADTS stream format or raw AAC stream output with AudioSpecificConfig metadata.
 - **C and C++ API**: Clean C function interfaces and modern C++ `micro_aac::AACEncoder` / `micro_aac::AACDecoder` wrappers.
+- **No Patent Risk**: Parametric Stereo (PS) encoding is disabled by default.
+
+## Supported Targets
+
+| Target | Real-Time Decode | Real-Time Encode | Notes |
+|---|---|---|---|
+| ESP32-S3 (240 MHz) | AAC-LC, HE-AAC v1, HE-AAC v2 | AAC-LC, HE-AAC v1 | Full FPU acceleration; PSRAM recommended for high workloads |
+| Classic ESP32 (240 MHz) | AAC-LC, HE-AAC v1 | AAC-LC, HE-AAC v1 | FPU acceleration; limited internal RAM without PSRAM |
+| ESP32-C6 (160 MHz) | No FPU | Voice only | Lacks hardware FPU; runs below real time on stereo |
+
+See [Freeware Advanced Audio ESP32 Guide](https://freewareadvancedaudio.github.io/docs/esp32-aac) for extensive benchmarks and hardware guidance.
+
+## Configuration
+
+In ESP-IDF:
+```bash
+idf.py menuconfig
+# Navigate to: Component config → micro-aac Configuration
+```
+
+Available Kconfig options:
+- `MICRO_AAC_MAX_CHANNELS`: Maximum audio channels (default: 2, range 1-8).
+- `MICRO_AAC_SBR_DECIMATION`: SBR spectral analysis decimation density (default: 1).
+- `MICRO_AAC_USE_SPIRAM`: Prefer SPIRAM (PSRAM) for codec state and buffers (default: `y` when SPIRAM enabled).
 
 ## Installation
 
@@ -24,7 +48,9 @@ lib_deps =
     https://github.com/esphome-libs/micro-aac.git
 ```
 
-## Encoder Usage (C++)
+## Usage Example
+
+### Encoder Usage (C++)
 
 ```cpp
 #include "micro_aac/aac_encoder.h"
@@ -47,13 +73,14 @@ if (encoder.init(config) == MICRO_AAC_OK) {
 }
 ```
 
-## Decoder Usage (C++)
+### Decoder Usage (C++)
 
 ```cpp
 #include "micro_aac/aac_decoder.h"
 
 micro_aac_dec_config_t dec_config;
 micro_aac_dec_config_init(&dec_config);
+dec_config.stream_format = MICRO_AAC_DEC_STREAM_ADTS;
 
 micro_aac::AACDecoder decoder;
 if (decoder.init(dec_config) == MICRO_AAC_DEC_OK) {
@@ -61,12 +88,32 @@ if (decoder.init(dec_config) == MICRO_AAC_DEC_OK) {
     int32_t bytes_left = aac_data_len;
     uint32_t samps_decoded = 0;
 
+    // Output buffer should hold at least decoder.get_max_output_bytes()
     decoder.decode(&in_ptr, &bytes_left, pcm_out_buffer, &samps_decoded);
 }
 ```
 
+## Memory Usage
+
+Codec state is allocated when the instance is created.
+- **AAC-LC Decode (FAAD)**: ~49 KB heap
+- **HE-AAC v1 Decode (FAAD)**: ~98 KB heap
+- **AAC-LC Encode (FAAC)**: ~49 KB mono, ~90 KB stereo
+- **HE-AAC v1 Encode (FAAC)**: ~83 KB mono, ~142 KB stereo
+
+When `CONFIG_MICRO_AAC_USE_SPIRAM` is enabled, heap allocations automatically prefer PSRAM (`MALLOC_CAP_SPIRAM`), preserving internal SRAM.
+
+## Testing
+
+A host-based CTest suite lives in `tests/`:
+```bash
+mkdir -p build && cd build
+cmake ..
+make
+ctest --output-on-failure
+```
+
 ## License
 
-This project wrapper is licensed under Apache-2.0.
-The FAAC encoder component is licensed under LGPL-2.1-or-later.
-The Helix AAC decoder component is licensed under RPSL-1.0 / RCSL.
+- micro-aac wrapper code: [Apache License 2.0](LICENSE)
+- FAAC encoder & FAAD decoder (`lib/faac/`): [LGPL-2.1-or-later](https://github.com/FreewareAdvancedAudio/faac/blob/master/COPYING)

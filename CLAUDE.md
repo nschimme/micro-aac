@@ -1,11 +1,11 @@
 # micro-aac Development Guide
 
-ESP-IDF component wrapping the FAAC AAC audio encoder with PSRAM support for ESP32 and ESPHome.
+ESP-IDF component wrapping the FAAC AAC audio encoder and FAAD AAC audio decoder with PSRAM support for ESP32 and ESPHome.
 
 ## Project Structure
 
 ```text
-lib/faac/             # Upstream FAAC encoder (git submodule)
+lib/faac/             # Upstream FAAC/FAAD library (git submodule)
 cmake/                # CMake build helpers and configuration template
 include/micro_aac/    # Public API headers
 src/                  # micro-aac C/C++ wrapper implementation

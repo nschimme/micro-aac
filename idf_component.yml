@@ -1,5 +1,5 @@
 version: "0.1.0"
-description: "AAC audio encoder library for ESP32 and ESP-IDF using FAAC"
+description: "AAC audio encoder and decoder library for ESP32 and ESP-IDF using FAAC and FAAD"
 url: "https://github.com/esphome-libs/micro-aac"
 targets:
   - esp32

@@ -1,14 +1,16 @@
 # cmake/sources.cmake
 
-function(micro_aac_get_sources FAAC_DIR HELIX_DIR)
+function(micro_aac_get_sources FAAC_DIR)
     set(FAAC_SOURCES
+        "${FAAC_DIR}/common/fft.c"
+        "${FAAC_DIR}/common/sbr_tables.c"
+        "${FAAC_DIR}/common/sfb_tables.c"
         "${FAAC_DIR}/libfaac/bitstream.c"
         "${FAAC_DIR}/libfaac/blockswitch.c"
         "${FAAC_DIR}/libfaac/channels.c"
         "${FAAC_DIR}/libfaac/cpu_compute.c"
         "${FAAC_DIR}/libfaac/faac.c"
         "${FAAC_DIR}/libfaac/filtbank.c"
-        "${FAAC_DIR}/libfaac/fft.c"
         "${FAAC_DIR}/libfaac/frame.c"
         "${FAAC_DIR}/libfaac/huff2.c"
         "${FAAC_DIR}/libfaac/huffdata.c"
@@ -16,8 +18,8 @@ function(micro_aac_get_sources FAAC_DIR HELIX_DIR)
         "${FAAC_DIR}/libfaac/ratecontrol.c"
         "${FAAC_DIR}/libfaac/sbr.c"
         "${FAAC_DIR}/libfaac/sbr_bitstream.c"
-        "${FAAC_DIR}/libfaac/sbr_tables.c"
         "${FAAC_DIR}/libfaac/sbr_analysis.c"
+        "${FAAC_DIR}/libfaac/sbr_huff_tables.c"
         "${FAAC_DIR}/libfaac/resample.c"
         "${FAAC_DIR}/libfaac/stereo.c"
         "${FAAC_DIR}/libfaac/tns.c"
@@ -25,36 +27,20 @@ function(micro_aac_get_sources FAAC_DIR HELIX_DIR)
         PARENT_SCOPE
     )
 
-    set(HELIX_AAC_SOURCES
-        "${HELIX_DIR}/src/libhelix-aac/aacdec.c"
-        "${HELIX_DIR}/src/libhelix-aac/aactabs.c"
-        "${HELIX_DIR}/src/libhelix-aac/bitstream.c"
-        "${HELIX_DIR}/src/libhelix-aac/buffers.c"
-        "${HELIX_DIR}/src/libhelix-aac/dct4.c"
-        "${HELIX_DIR}/src/libhelix-aac/decelmnt.c"
-        "${HELIX_DIR}/src/libhelix-aac/dequant.c"
-        "${HELIX_DIR}/src/libhelix-aac/fft.c"
-        "${HELIX_DIR}/src/libhelix-aac/filefmt.c"
-        "${HELIX_DIR}/src/libhelix-aac/huffman.c"
-        "${HELIX_DIR}/src/libhelix-aac/hufftabs.c"
-        "${HELIX_DIR}/src/libhelix-aac/imdct.c"
-        "${HELIX_DIR}/src/libhelix-aac/noiseless.c"
-        "${HELIX_DIR}/src/libhelix-aac/pns.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbr.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrfft.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrfreq.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrhfadj.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrhfgen.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrhuff.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrimdct.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrmath.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrqmf.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrside.c"
-        "${HELIX_DIR}/src/libhelix-aac/sbrtabs.c"
-        "${HELIX_DIR}/src/libhelix-aac/stproc.c"
-        "${HELIX_DIR}/src/libhelix-aac/tns.c"
-        "${HELIX_DIR}/src/libhelix-aac/trigtabs.c"
-        "${HELIX_DIR}/src/utils/helix_memory.cpp"
+    # Use forwarder files in src/ for files that collide with libfaac filenames under PlatformIO ESP-IDF
+    set(FAAD_SOURCES
+        "${FAAC_DIR}/libfaad/decoder.c"
+        "${FAAC_DIR}/libfaad/bits.c"
+        "${FAAC_DIR}/libfaad/asc.c"
+        "${FAAC_DIR}/libfaad/huffman.c"
+        "${FAAC_DIR}/libfaad/syntax.c"
+        "${FAAC_DIR}/libfaad/dequant.c"
+        "${FAAC_DIR}/libfaad/imdct.c"
+        "${FAAC_DIR}/libfaad/sbr_dec_tables.c"
+        "${FAAC_DIR}/libfaad/ps.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/faad_stereo.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/faad_tns.c"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/faad_sbr.c"
         PARENT_SCOPE
     )
 

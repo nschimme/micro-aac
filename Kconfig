@@ -7,7 +7,7 @@ menu "micro-aac Configuration"
         default 2
         range 1 8
         help
-            Maximum number of channels supported by FAAC encoder (1 = mono, 2 = stereo).
+            Maximum number of channels supported by FAAC encoder and FAAD decoder (1 = mono, 2 = stereo).
             Lower numbers reduce static array and memory overhead.
 
     config MICRO_AAC_SBR_DECIMATION
@@ -23,7 +23,7 @@ menu "micro-aac Configuration"
         default y
         depends on SPIRAM
         help
-            When enabled, memory allocations for the AAC encoder will prefer SPIRAM/PSRAM
+            When enabled, memory allocations for the AAC encoder and decoder will prefer SPIRAM/PSRAM
             to save internal RAM.
 
 endmenu
