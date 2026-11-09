@@ -10,7 +10,7 @@
 #define PACKAGE_VERSION "0.1.0"
 
 #ifndef MAX_CHANNELS
-#define MAX_CHANNELS 2
+#define MAX_CHANNELS @MAX_CHANNELS@
 #endif
 
 #ifndef FAAC_ENCODER_SBR
@@ -27,7 +27,7 @@
 #endif
 
 #ifndef FAAC_SBR_DECIMATION
-#define FAAC_SBR_DECIMATION 1
+#define FAAC_SBR_DECIMATION @FAAC_SBR_DECIMATION@
 #endif
 
 #undef FAAC_STATS

@@ -4,9 +4,10 @@
 #include <stdlib.h>
 #include <math.h>
 
-static int test_roundtrip(uint32_t sample_rate, uint32_t channels, micro_aac_format_t format) {
-    printf("Testing roundtrip: rate=%u, channels=%u, format=%s...\n",
-           sample_rate, channels, (format == MICRO_AAC_FORMAT_ADTS) ? "ADTS" : "RAW");
+static int test_roundtrip_dm(uint32_t sample_rate, uint32_t channels, micro_aac_format_t format,
+                             micro_aac_dec_downmix_t downmix, uint32_t out_channels) {
+    printf("Testing roundtrip: rate=%u, channels=%u, format=%s, downmix=%d...\n",
+           sample_rate, channels, (format == MICRO_AAC_FORMAT_ADTS) ? "ADTS" : "RAW", (int)downmix);
 
     micro_aac_config_t enc_cfg;
     micro_aac_config_init(&enc_cfg);
@@ -31,6 +32,7 @@ static int test_roundtrip(uint32_t sample_rate, uint32_t channels, micro_aac_for
     dec_cfg.stream_format = (format == MICRO_AAC_FORMAT_ADTS) ? MICRO_AAC_DEC_STREAM_ADTS : MICRO_AAC_DEC_STREAM_RAW;
     dec_cfg.asc_buf = asc_buf;
     dec_cfg.asc_len = asc_len;
+    dec_cfg.downmix = downmix;
 
     micro_aac_decoder_t *decoder = NULL;
     micro_aac_dec_status_t dec_status = micro_aac_decoder_create(&dec_cfg, &decoder);
@@ -103,9 +105,9 @@ static int test_roundtrip(uint32_t sample_rate, uint32_t channels, micro_aac_for
     micro_aac_decoder_get_frame_info(decoder, &dec_info);
     printf("Decoded frame info: sr=%u, ch=%u, samps=%u\n", dec_info.sample_rate, dec_info.num_channels, dec_info.output_samps);
 
-    if (dec_info.sample_rate != sample_rate || dec_info.num_channels != channels) {
+    if (dec_info.sample_rate != sample_rate || dec_info.num_channels != out_channels) {
         fprintf(stderr, "Sample rate or channel count mismatch: expected %u/%u, got %u/%u\n",
-                sample_rate, channels, dec_info.sample_rate, dec_info.num_channels);
+                sample_rate, out_channels, dec_info.sample_rate, dec_info.num_channels);
         free(pcm_in);
         free(aac_buf);
         free(pcm_out);
@@ -122,6 +124,10 @@ static int test_roundtrip(uint32_t sample_rate, uint32_t channels, micro_aac_for
     return 0;
 }
 
+static int test_roundtrip(uint32_t sample_rate, uint32_t channels, micro_aac_format_t format) {
+    return test_roundtrip_dm(sample_rate, channels, format, MICRO_AAC_DEC_DOWNMIX_NONE, channels);
+}
+
 int main(void) {
     printf("Starting micro_aac encoder + decoder test suite...\n");
 
@@ -129,6 +135,10 @@ int main(void) {
     if (test_roundtrip(44100, 2, MICRO_AAC_FORMAT_ADTS) != 0) return 1;
     if (test_roundtrip(48000, 1, MICRO_AAC_FORMAT_RAW) != 0) return 1;
     if (test_roundtrip(48000, 2, MICRO_AAC_FORMAT_RAW) != 0) return 1;
+
+    if (test_roundtrip_dm(44100, 2, MICRO_AAC_FORMAT_ADTS, MICRO_AAC_DEC_DOWNMIX_MONO, 1) != 0) return 1;
+    if (test_roundtrip_dm(48000, 2, MICRO_AAC_FORMAT_RAW, MICRO_AAC_DEC_DOWNMIX_MONO, 1) != 0) return 1;
+    if (test_roundtrip_dm(44100, 2, MICRO_AAC_FORMAT_ADTS, MICRO_AAC_DEC_DOWNMIX_STEREO, 2) != 0) return 1;
 
     printf("All decoder tests passed successfully!\n");
     return 0;

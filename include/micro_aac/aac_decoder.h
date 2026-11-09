@@ -25,11 +25,18 @@ typedef enum {
     MICRO_AAC_DEC_STREAM_ADTS = 1
 } micro_aac_dec_stream_format_t;
 
+typedef enum {
+    MICRO_AAC_DEC_DOWNMIX_NONE = 0,   /* Preserve native channel layout (default) */
+    MICRO_AAC_DEC_DOWNMIX_MONO = 1,   /* Downmix all channels to mono */
+    MICRO_AAC_DEC_DOWNMIX_STEREO = 2  /* Downmix surround to 2-channel stereo */
+} micro_aac_dec_downmix_t;
+
 typedef struct {
     micro_aac_dec_stream_format_t stream_format; /* ADTS (default) or RAW */
     bool prefer_psram;                           /* If true on ESP32, attempt PSRAM/SPIRAM allocation */
     const uint8_t *asc_buf;                      /* AudioSpecificConfig buffer (required for RAW, optional for ADTS) */
     uint32_t asc_len;                            /* Length of asc_buf */
+    micro_aac_dec_downmix_t downmix;             /* Channel downmix mode (default: none) */
 } micro_aac_dec_config_t;
 
 typedef struct {
