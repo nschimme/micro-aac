@@ -24,7 +24,10 @@ typedef struct {
 static const fixture_t FIXTURES[] = {
     {"lc_stereo_44k1.aac", 44100, 2, 1024},
     {"lc_mono_16k.aac", 16000, 1, 1024},
+#ifndef MICRO_AAC_TEST_NO_SBR
+    /* Without SBR the decoder plays an HE-AAC stream's core layer at half the rate, so only check it when built in */
     {"he_v1_stereo_44k1.aac", 44100, 2, 2048},
+#endif
 };
 
 typedef struct {

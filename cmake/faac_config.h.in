@@ -34,6 +34,9 @@
 #undef FAAD_STATS
 
 /* FAAD decoder feature trimming */
+#cmakedefine FAAD_DISABLE_SBR 1
+#cmakedefine FAAD_DISABLE_PS 1
+
 #ifndef FAAD_DISABLE_DAB
 #define FAAD_DISABLE_DAB 1
 #endif

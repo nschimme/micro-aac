@@ -18,6 +18,20 @@ menu "micro-aac Configuration"
             SBR spectral analysis density (1 = full quality, 2 = 2nd slot, 4 = 4th slot, 8 = 8th slot).
             Higher values reduce CPU usage for HE-AAC.
 
+    config MICRO_AAC_DECODER_SBR
+        bool "Decode HE-AAC (spectral band replication)"
+        default y
+        help
+            Support HE-AAC streams. Disabling it builds an AAC-LC only decoder and frees about 21 KB of
+            internal RAM and some flash. Parametric stereo needs SBR, so it is disabled with it.
+
+    config MICRO_AAC_DECODER_PS
+        bool "Decode HE-AAC v2 (parametric stereo)"
+        default y
+        depends on MICRO_AAC_DECODER_SBR
+        help
+            Support HE-AAC v2 streams. Disabling it frees about 17 KB of internal RAM.
+
     config MICRO_AAC_USE_SPIRAM
         bool "Prefer SPIRAM (PSRAM) for Memory Allocations"
         default y
