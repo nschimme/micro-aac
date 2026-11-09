@@ -1,3 +1,6 @@
+#ifndef FAAC_CONFIG_H
+#define FAAC_CONFIG_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -10,10 +13,33 @@
 #define MAX_CHANNELS 2
 #endif
 
+#ifndef FAAC_ENCODER_SBR
+#define FAAC_ENCODER_SBR 1
+#endif
+
+/* PS encoding disabled due to patents */
+#ifndef FAAC_ENCODER_PS
+#define FAAC_ENCODER_PS 0
+#endif
+
+#ifndef FAAC_ENCODER_DRC
+#define FAAC_ENCODER_DRC 0
+#endif
+
 #ifndef FAAC_SBR_DECIMATION
 #define FAAC_SBR_DECIMATION 1
 #endif
 
-#ifndef FAAC_STATS
-#define FAAC_STATS 0
+#undef FAAC_STATS
+#undef FAAD_STATS
+
+/* FAAD decoder feature trimming */
+#ifndef FAAD_DISABLE_DAB
+#define FAAD_DISABLE_DAB 1
 #endif
+
+#ifndef FAAD_DISABLE_DRC
+#define FAAD_DISABLE_DRC 1
+#endif
+
+#endif /* FAAC_CONFIG_H */

@@ -68,14 +68,14 @@ micro_aac_status_t micro_aac_encoder_create(const micro_aac_config_t *config, mi
     }
 
     params.sample_rate = config->sample_rate;
-    params.num_channels = config->num_channels;
-    params.mpeg_version = FAAC_MPEG4;
-    params.object_type = (config->object_type == MICRO_AAC_OBJECT_HE) ? FAAC_OBJ_HE_AAC_V1 : FAAC_OBJ_LOW;
-    params.output_format = (config->format == MICRO_AAC_FORMAT_ADTS) ? FAAC_STREAM_ADTS : FAAC_STREAM_RAW;
+    params.channels = config->num_channels;
+    params.object_type = (config->object_type == MICRO_AAC_OBJECT_HE) ? FAAC_OBJ_HE_AAC_V1 : FAAC_OBJ_LC;
+    params.stream_format = (config->format == MICRO_AAC_FORMAT_ADTS) ? FAAC_STREAM_ADTS : FAAC_STREAM_RAW;
     params.input_format = FAAC_INPUT_16BIT;
+    params.channel_layout = FAAC_LAYOUT_AAC;
 
     if (config->bit_rate > 0) {
-        params.bit_rate = config->bit_rate / config->num_channels;
+        params.bit_rate = config->bit_rate;
     }
 
     status = faac_encoder_open(&params, &enc->faac_handle);
