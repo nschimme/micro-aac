@@ -1,6 +1,6 @@
 {
   "name": "micro-aac",
-  "version": "0.1.1",
+  "version": "0.1.0",
   "description": "AAC encoder and decoder wrapper library for ESP32 and ESP-IDF based on FAAC and FAAD",
   "keywords": ["aac", "audio", "encoder", "decoder", "faac", "faad", "esp32", "esphome"],
   "license": "LGPL-2.1-or-later",
